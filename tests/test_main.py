@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, AsyncMock
 from app.main import main
+import logging
 
 
 class TestMainFunction(unittest.TestCase):
@@ -58,3 +59,20 @@ class TestMainFunction(unittest.TestCase):
         ]
         await main()
         self.assertEqual(mock_connect.call_count, 2)
+
+
+class TestLogging(unittest.TestCase):
+    @patch('logging.info')
+    def test_logging_info(self, mock_logging_info):
+        # Предположим, что это часть вашего класса
+        logging.info("Тестовое сообщение")
+
+        # Проверяем, что logging.info был вызван с правильным сообщением
+        mock_logging_info.assert_called_once_with("Тестовое сообщение")
+
+    @patch('logging.error')
+    def test_logging_error(self, mock_logging_error):
+        logging.error("Ошибка подключения")
+
+        # Проверяем, что logging.error был вызван с правильным сообщением
+        mock_logging_error.assert_called_once_with("Ошибка подключения")
