@@ -7,7 +7,7 @@
 Структура проекта:
 ====== 
 
-![image](https://github.com/user-attachments/assets/1c4d1bd1-3945-436e-94ef-81c41c5ff247)
+![image](https://github.com/user-attachments/assets/03f5424e-0038-4a63-ad88-4bd778e84404)
 
 
 ## Установка и запуск
