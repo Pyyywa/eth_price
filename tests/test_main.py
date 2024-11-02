@@ -1,64 +1,49 @@
 import unittest
 from unittest.mock import patch, AsyncMock
+import numpy as np
 from app.main import main
 import logging
 
+class TestMain(unittest.IsolatedAsyncioTestCase):
+    @patch('app.main.BinanceWSConsumer')
+    @patch('app.main.time')
+    async def test_main(self, mock_time, MockBinanceWSConsumer):
+        mock_time.time.side_effect = [1609459200, 1609459260, 1609459320]  # Mocking time.time() call
 
-class TestMainFunction(unittest.TestCase):
-    @patch("app.BinanceWSConsumer.receive", new_callable=AsyncMock)
-    @patch("app.BinanceWSConsumer.connect", new_callable=AsyncMock)
-    async def test_main_function(self, mock_connect, mock_receive):
-        mock_connect.return_value = AsyncMock()
-        mock_receive.side_effect = [
-            (2000.0, 1234567890),  # ETH price
-            (60000.0, 1234567890),  # BTC price
-            (2050.0, 1234567891),  # ETH price
-            (60500.0, 1234567891),  # BTC price
-            (2100.0, 1234567892),  # ETH price
-            (61000.0, 1234567892),  # BTC price
-        ]
-        await main()
-        self.assertEqual(mock_connect.call_count, 2)
+        mock_consumer_eth = MockBinanceWSConsumer.return_value
+        mock_consumer_btc = MockBinanceWSConsumer.return_value
 
-    @patch("app.BinanceWSConsumer.receive", new_callable=AsyncMock)
-    @patch("app.BinanceWSConsumer.connect", new_callable=AsyncMock)
-    async def test_main_function_insufficient_data(self, mock_connect, mock_receive):
-        mock_connect.return_value = AsyncMock()
-        mock_receive.side_effect = [
-            (2000.0, 1234567890),  # ETH price
-            (60000.0, 1234567890),  # BTC price
-            # insufficient data for further calculations
-        ]
-        await main()
-        self.assertEqual(mock_connect.call_count, 2)
+        mock_consumer_eth.receive = AsyncMock(side_effect=[
+            (1000.0, 1609459200000),
+            (1010.0, 1609459260000),
+            (1020.0, 1609459320000),
+        ])
 
-    @patch("app.BinanceWSConsumer.receive", new_callable=AsyncMock)
-    @patch("app.BinanceWSConsumer.connect", new_callable=AsyncMock)
-    async def test_main_function_division_by_zero(self, mock_connect, mock_receive):
-        mock_connect.return_value = AsyncMock()
-        mock_receive.side_effect = [
-            (2000.0, 1234567890),  # ETH price
-            (60000.0, 1234567890),  # BTC price
-            (0.0, 1234567891),  # ETH price (will cause division by zero)
-            (60500.0, 1234567891),  # BTC price
-        ]
-        await main()
-        self.assertEqual(mock_connect.call_count, 2)
+        mock_consumer_btc.receive = AsyncMock(side_effect=[
+            (30000.0, 1609459200000),
+            (30100.0, 1609459260000),
+            (30200.0, 1609459320000),
+        ])
 
-    @patch("app.BinanceWSConsumer.receive", new_callable=AsyncMock)
-    @patch("app.BinanceWSConsumer.connect", new_callable=AsyncMock)
-    async def test_main_function_correlation(self, mock_connect, mock_receive):
-        mock_connect.return_value = AsyncMock()
-        mock_receive.side_effect = [
-            (2000.0, 1234567890),  # ETH price
-            (60000.0, 1234567890),  # BTC price
-            (2100.0, 1234567891),  # ETH price
-            (60500.0, 1234567891),  # BTC price
-            (2200.0, 1234567892),  # ETH price
-            (61000.0, 1234567892),  # BTC price
-        ]
-        await main()
-        self.assertEqual(mock_connect.call_count, 2)
+        with patch('app.main.asyncio.sleep', new_callable=AsyncMock):
+            await main()
+
+        self.assertEqual(mock_consumer_eth.receive.call_count, 3)
+        self.assertEqual(mock_consumer_btc.receive.call_count, 3)
+
+        # Check if the correlation coefficient and returns were calculated correctly
+        eth_prices = [1000.0, 1010.0, 1020.0]
+        btc_prices = [30000.0, 30100.0, 30200.0]
+
+        eth_returns = np.diff(eth_prices) / eth_prices[:-1]
+        btc_returns = np.diff(btc_prices) / btc_prices[:-1]
+
+        corr_coeff = np.corrcoef(eth_returns, btc_returns)[0, 1]
+        eth_returns_no_btc = eth_returns - corr_coeff * btc_returns
+
+        eth_returns_last_hour = (np.prod(eth_returns_no_btc + 1) - 1) * 100
+
+        self.assertAlmostEqual(eth_returns_last_hour, 0.995, places=2)
 
 
 class TestLogging(unittest.TestCase):
