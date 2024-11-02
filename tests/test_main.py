@@ -4,28 +4,33 @@ import numpy as np
 from app.main import main
 import logging
 
+
 class TestMain(unittest.IsolatedAsyncioTestCase):
-    @patch('app.main.BinanceWSConsumer')
-    @patch('app.main.time')
+    @patch("app.main.BinanceWSConsumer")
+    @patch("app.main.time")
     async def test_main(self, mock_time, MockBinanceWSConsumer):
         mock_time.time.side_effect = [1609459200, 1609459260, 1609459320]
 
         mock_consumer_eth = MockBinanceWSConsumer.return_value
         mock_consumer_btc = MockBinanceWSConsumer.return_value
 
-        mock_consumer_eth.receive = AsyncMock(side_effect=[
-            (1000.0, 1609459200000),
-            (1010.0, 1609459260000),
-            (1020.0, 1609459320000),
-        ])
+        mock_consumer_eth.receive = AsyncMock(
+            side_effect=[
+                (1000.0, 1609459200000),
+                (1010.0, 1609459260000),
+                (1020.0, 1609459320000),
+            ]
+        )
 
-        mock_consumer_btc.receive = AsyncMock(side_effect=[
-            (30000.0, 1609459200000),
-            (30100.0, 1609459260000),
-            (30200.0, 1609459320000),
-        ])
+        mock_consumer_btc.receive = AsyncMock(
+            side_effect=[
+                (30000.0, 1609459200000),
+                (30100.0, 1609459260000),
+                (30200.0, 1609459320000),
+            ]
+        )
 
-        with patch('app.main.asyncio.sleep', new_callable=AsyncMock):
+        with patch("app.main.asyncio.sleep", new_callable=AsyncMock):
             await main()
 
         self.assertEqual(mock_consumer_eth.receive.call_count, 3)
@@ -47,7 +52,7 @@ class TestMain(unittest.IsolatedAsyncioTestCase):
 
 
 class TestLogging(unittest.TestCase):
-    @patch('logging.info')
+    @patch("logging.info")
     def test_logging_info(self, mock_logging_info):
         # Предположим, что это часть вашего класса
         logging.info("Тестовое сообщение")
@@ -55,7 +60,7 @@ class TestLogging(unittest.TestCase):
         # Проверяем, что logging.info был вызван с правильным сообщением
         mock_logging_info.assert_called_once_with("Тестовое сообщение")
 
-    @patch('logging.error')
+    @patch("logging.error")
     def test_logging_error(self, mock_logging_error):
         logging.error("Ошибка подключения")
 
