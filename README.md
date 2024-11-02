@@ -38,5 +38,5 @@ docker run --rm -it price_analysis_app
 Запуск с использованием Docker Compose
 Запустите приложение с помощью Docker Compose:
 ```python
-docker-compose up --build
+docker-compose up -d --build
 ```
