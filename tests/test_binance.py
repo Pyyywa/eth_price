@@ -1,4 +1,3 @@
-# tests/test_binance.py
 import unittest
 from unittest.mock import patch, AsyncMock
 from app.binance import BinanceWSConsumer

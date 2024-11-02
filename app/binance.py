@@ -24,8 +24,8 @@ class BinanceWSConsumer:
     async def receive(self):
         """Получает данные из WebSocket."""
         if self.websocket is None:
-            logging.warning("WebSocket не подключен. Вызовите connect() сначала.")
-            raise RuntimeError("WebSocket not connected. Call connect() first.")
+            logging.warning("WebSocket не подключен. Вызовите connect сначала")
+            raise RuntimeError("WebSocket not connected. Call connect first")
 
         try:
             data = json.loads(await self.websocket.recv())

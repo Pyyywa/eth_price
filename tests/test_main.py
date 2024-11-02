@@ -8,7 +8,7 @@ class TestMain(unittest.IsolatedAsyncioTestCase):
     @patch('app.main.BinanceWSConsumer')
     @patch('app.main.time')
     async def test_main(self, mock_time, MockBinanceWSConsumer):
-        mock_time.time.side_effect = [1609459200, 1609459260, 1609459320]  # Mocking time.time() call
+        mock_time.time.side_effect = [1609459200, 1609459260, 1609459320]
 
         mock_consumer_eth = MockBinanceWSConsumer.return_value
         mock_consumer_btc = MockBinanceWSConsumer.return_value

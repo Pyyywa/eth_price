@@ -10,7 +10,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TIME = 12000  # 1 час в миллисекундах
+TIME = 3600000  # 1 час в миллисекундах
 
 
 async def main():
@@ -33,8 +33,10 @@ async def main():
                 eth_prices.append([eth_price, eth_timestamp])
                 btc_prices.append([btc_price, btc_timestamp])
                 logger.info(
-                    f"ETHUSDT PRICE: {eth_price}, ETH TIMESTAMP: {eth_timestamp}, "
-                    f"BTCUSDT PRICE: {btc_price}, BTC TIMESTAMP: {btc_timestamp}"
+                    f"ETHUSDT PRICE: {eth_price}, "
+                    f"ETH TIMESTAMP: {eth_timestamp}, "
+                    f"BTCUSDT PRICE: {btc_price}, "
+                    f"BTC TIMESTAMP: {btc_timestamp}"
                 )
 
             current_time = round(time.time() * 1000)
@@ -67,7 +69,8 @@ async def main():
                 # Выводим результат, если колебание превышает 1%
                 if abs(eth_returns_last_hour) > 1:
                     print(
-                        f"Колебание ETH {round(eth_returns_last_hour, 2)}% за прошедший час!"
+                        f"Колебание ETH "
+                        f"{round(eth_returns_last_hour, 2)}% за прошедший час!"
                     )
 
             await asyncio.sleep(0.1)
