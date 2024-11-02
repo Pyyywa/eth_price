@@ -7,8 +7,10 @@
 Структура проекта:
 ====== 
 
-![image](https://github.com/user-attachments/assets/1c4d1bd1-3945-436e-94ef-81c41c5ff247)
+![image](https://github.com/user-attachments/assets/03f5424e-0038-4a63-ad88-4bd778e84404)
 
+Программа работает с WebSocket Binance. За подключение к бирже и получению информации отвечает класс BinanceWSConsumer.
+Анализ цен фьючерсов происходит с помощью библиотеки NumPy: определяем зависимость между ценами с помощью корреляции.
 
 ## Установка и запуск
 
