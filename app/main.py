@@ -26,6 +26,7 @@ async def main():
 
     try:
         while True:
+
             eth_price, eth_timestamp = await bwsc1.receive()
             btc_price, btc_timestamp = await bwsc2.receive()
 

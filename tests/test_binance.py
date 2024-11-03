@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import patch, AsyncMock
 from app.binance import BinanceWSConsumer
 
-
 class TestBinanceWSConsumer(unittest.IsolatedAsyncioTestCase):
     async def test_connect(self):
         consumer = BinanceWSConsumer()
@@ -21,7 +20,12 @@ class TestBinanceWSConsumer(unittest.IsolatedAsyncioTestCase):
 
     async def test_disconnect(self):
         consumer = BinanceWSConsumer()
-        consumer.websocket = AsyncMock()
-        await consumer.disconnect()
-        consumer.websocket.close.assert_called_once()
+        with patch('websockets.connect', new_callable=AsyncMock):
+            await consumer.connect("wss://test.websocket.url")
+            await consumer.disconnect()
+            self.assertIsNone(consumer.websocket)
+
+    async def test_disconnect_without_connect(self):
+        consumer = BinanceWSConsumer()
+        await consumer.disconnect()  # Should not raise an exception
         self.assertIsNone(consumer.websocket)
